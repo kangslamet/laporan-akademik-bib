@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Pelaporan Akademik Awardee BIB</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+        max-width: 800px;
+        margin: auto;
+        background: #f5f5f5;
+      }
+      input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+      button {
+        padding: 10px 20px;
+      }
+      .result {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+      }
+      .label {
+        font-weight: bold;
+      }
+      a {
+        color: #0077cc;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h2>Pelaporan Akademik Awardee BIB</h2>
+    <p>Masukkan <strong>NIM</strong> Anda:</p>
+    <input type="text" id="searchInput" placeholder="Contoh: 210123456" />
+    <button onclick="cariData()">Cari</button>
+
+    <div id="hasil"></div>
+
+    <script>
+      const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSubVEdPeek2I1y-Iow3omK3HZU8YLGS7ilFT-gXMpeEJCYP1Bai4S2WXT80hxKClLfGIaD6-PTadJR/pub?output=csv";
+      let data = [];
+
+      Papa.parse(csvUrl, {
+        download: true,
+        header: true,
+        complete: function (results) {
+          data = results.data;
+        },
+      });
+
+      function cariData() {
+        const nim = document.getElementById("searchInput").value.trim();
+        const hasilDiv = document.getElementById("hasil");
+        const mhs = data.find((row) => row["NIM"] === nim);
+
+        if (!mhs) {
+          hasilDiv.innerHTML = `<p style='color:red;'>Data tidak ditemukan. Pastikan NIM benar.</p>`;
+          return;
+        }
+
+        hasilDiv.innerHTML = `
+        <div class="result">
+          <p><span class="label">Nama:</span> ${mhs["Nama Lengkap"]}</p>
+          <p><span class="label">Semester:</span> ${mhs["Semester"]}</p>
+          <p><span class="label">IPK:</span> ${mhs["IPK"]}</p>
+          <p><span class="label">KHS:</span> <a href="${mhs["KHS"]}" target="_blank">Lihat KHS</a></p>
+          <p><span class="label">Kegiatan Akademik:</span> ${mhs["Kegiatan Akademik"]}</p>
+          <p><span class="label">Kegiatan Non Akademik:</span> ${mhs["Kegiatan Non Akademik"]}</p>
+          <p><span class="label">Sertifikat/Dokumen:</span> <a href="${mhs["Sertifikat/ Dokumen lainnya"]}" target="_blank">Lihat Dokumen</a></p>
+          <p><span class="label">Foto Kegiatan:</span> <a href="${mhs["Foto Kegiatan"]}" target="_blank">Lihat Foto</a></p>
+        </div>
+      `;
+      }
+    </script>
+  </body>
+</html>
