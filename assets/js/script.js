@@ -14,7 +14,7 @@ function cariData() {
   const input = document.getElementById("searchInput").value.trim();
   const hasilDiv = document.getElementById("hasil");
 
-  const hasil = data.find((item) => item["NIM"] === input);
+  const hasil = data.find((item) => item["NIM"]?.trim() === input);
 
   if (hasil) {
     hasilDiv.innerHTML = `
