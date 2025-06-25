@@ -1,4 +1,10 @@
+// Variabel global
 let data = [];
+
+// Spinner element
+const hasilDiv = document.getElementById("hasil");
+const spinner = document.createElement("div");
+spinner.innerHTML = `<p style="color: gray;">⏳ Memuat data...</p>`;
 
 // Ambil data dari Google Spreadsheet CSV
 Papa.parse(csvUrl, {
@@ -12,30 +18,34 @@ Papa.parse(csvUrl, {
 // Fungsi pencarian berdasarkan NIM
 function cariData() {
   const input = document.getElementById("searchInput").value.trim();
-  const hasilDiv = document.getElementById("hasil");
+  hasilDiv.innerHTML = ""; // Reset hasil
+  hasilDiv.appendChild(spinner); // Tampilkan spinner
 
-  const hasil = data.find((item) => item["NIM"]?.trim() === input);
+  // Delay untuk memastikan UI update sebelum proses data
+  setTimeout(() => {
+    const hasil = data.find((item) => item["NIM"] === input);
 
-  if (hasil) {
-    hasilDiv.innerHTML = `
-      <h3 style="color: #28a745;">Data Ditemukan</h3>
-      <p><strong>Nama Lengkap:</strong> ${hasil["Nama Lengkap"]}</p>
-      <p><strong>Tempat & Tanggal Lahir:</strong> ${hasil["Tempat & Tanggal Lahir"]}</p>
-      <p><strong>Jenis Kelamin:</strong> ${hasil["Jenis Kelamin"]}</p>
-      <p><strong>Nomor WA:</strong> ${hasil["Nomor WA"]}</p>
-      <p><strong>Semester:</strong> ${hasil["Semester"]}</p>
-      <p><strong>IPK:</strong> ${hasil["IPK"]}</p>
-      <p><strong>KRS:</strong> ${hasil["KRS"]}</p>
-      <p><strong>KHS:</strong> ${hasil["KHS"]}</p>
-      <p><strong>Kegiatan Akademik:</strong> ${hasil["Kegiatan Akademik"]}</p>
-      <p><strong>Kegiatan Non Akademik:</strong> ${hasil["Kegiatan Non Akademik"]}</p>
-      <p><strong>Sertifikat/Dokumen lainnya:</strong> ${hasil["Sertifikat/ Dokumen lainnya"]}</p>
-      <p><strong>Foto Kegiatan:</strong> <a href="${hasil["Foto Kegiatan"]}" target="_blank">Lihat Foto</a></p>
-    `;
-  } else {
-    hasilDiv.innerHTML = `
-      <h3 style="color: #dc3545;">NIM Tidak Ditemukan</h3>
-      <p>Silakan periksa kembali atau hubungi admin.</p>
-    `;
-  }
+    if (hasil) {
+      let output = `<h3 style="color: #28a745;">Data Ditemukan</h3><ul>`;
+      for (const [key, value] of Object.entries(hasil)) {
+        if (value && key !== "NIM") {
+          if (key === "Foto Kegiatan") {
+            output += `<li><strong>${key}:</strong> <a href="${value}" target="_blank">Lihat Foto</a></li>`;
+          } else {
+            output += `<li><strong>${key}:</strong> ${value}</li>`;
+          }
+        }
+      }
+      output += `</ul>`;
+      hasilDiv.innerHTML = `<div class="hasil-box">${output}</div>`;
+
+      // Auto scroll ke hasil
+      hasilDiv.scrollIntoView({ behavior: "smooth" });
+    } else {
+      hasilDiv.innerHTML = `
+        <h3 style="color: #dc3545;">NIM Tidak Ditemukan</h3>
+        <p>Silakan periksa kembali atau hubungi admin.</p>
+      `;
+    }
+  }, 300); // biar spinner sempat muncul
 }
